@@ -1,0 +1,332 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Coffee, Heart, DoorOpen, Instagram, MapPin, Sofa, ChevronDown, Sparkles } from 'lucide-react';
+
+// --- Komponen Text Reveal yang Lebih Ringan ---
+const TextReveal = ({ children, delay = 0 }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.2 });
+    if (domRef.current) observer.observe(domRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={domRef} className="overflow-hidden">
+      <div 
+        className={`transition-all duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+        }`}
+        style={{ transitionDelay: `${delay}ms`, willChange: 'transform, opacity' }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// --- Komponen FadeIn dengan Optimasi Performa ---
+const FadeIn = ({ children, delay = 0, direction = 'up', className = '' }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const domRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.1 });
+    if (domRef.current) observer.observe(domRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const variants = {
+    up: 'translate-y-10',
+    down: '-translate-y-10',
+    left: 'translate-x-10',
+    right: '-translate-x-10',
+    scale: 'scale-[0.98]'
+  };
+
+  return (
+    <div
+      ref={domRef}
+      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${className} ${
+        isVisible ? 'opacity-100 translate-y-0 translate-x-0 scale-100' : `opacity-0 ${variants[direction] || 'translate-y-10'}`
+      }`}
+      style={{ transitionDelay: `${delay}ms`, willChange: 'transform, opacity' }}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default function VrenkuApp() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    let requestRef;
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+      requestRef = requestAnimationFrame(() => {});
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(requestRef);
+    };
+  }, []);
+
+  return (
+    <div className="font-sans antialiased text-[#2C1810] bg-[#FAF7F2] min-h-screen selection:bg-[#8B4513]/20 overflow-x-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        .font-serif { font-family: 'Lora', serif; }
+        .bg-grain {
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html { scroll-behavior: smooth; }
+      `}} />
+
+      {/* Grain Overlay */}
+      <div className="fixed inset-0 z-[100] pointer-events-none bg-grain mix-blend-multiply opacity-40" />
+
+      {/* SECTION 1: HERO */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{ 
+            backgroundImage: "url('https://images.unsplash.com/photo-1495474472201-447545e31ab3?auto=format&fit=crop&q=80&w=2000')",
+            transform: `scale(${1 + scrollY * 0.0003})`,
+            willChange: 'transform'
+          }}
+        />
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-[#FAF7F2]" />
+
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          <FadeIn>
+            <span className="inline-block text-[#FAF7F2]/80 tracking-[0.3em] uppercase text-[10px] md:text-xs mb-6 border-b border-[#FAF7F2]/20 pb-2">Banjarmasin — Sejak 2026</span>
+          </FadeIn>
+          <TextReveal delay={200}>
+            <h1 className="font-serif text-5xl md:text-8xl lg:text-9xl text-[#FAF7F2] mb-6 leading-tight italic drop-shadow-xl">
+              Singgah dulu.
+            </h1>
+          </TextReveal>
+          <FadeIn delay={600}>
+            <p className="text-lg md:text-2xl text-[#FAF7F2]/90 max-w-2xl mx-auto font-light leading-relaxed px-4">
+              Tidak ada yang terburu-buru di sini. Tarik kursi, temukan tenangmu.
+            </p>
+          </FadeIn>
+        </div>
+
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3">
+          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-[#FAF7F2]/40 to-transparent" />
+          <ChevronDown size={18} className="text-[#FAF7F2]/40 animate-bounce" />
+        </div>
+      </section>
+
+      {/* SECTION 2: FILOSOFI */}
+      <section className="relative py-24 md:py-40 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
+          <div className="lg:col-span-5 lg:sticky lg:top-40">
+            <FadeIn direction="right">
+              <span className="text-[#8B4513] font-medium tracking-widest uppercase text-xs mb-4 block italic">— Filosofi Kami</span>
+              <h2 className="font-serif text-4xl md:text-7xl text-[#8B4513] mb-6 md:mb-8 leading-tight">
+                Teman dulu, jual-beli belakangan.
+              </h2>
+            </FadeIn>
+          </div>
+          
+          <div className="lg:col-span-7 lg:pl-16">
+            <FadeIn delay={200}>
+              <div className="space-y-8 text-lg md:text-2xl text-[#2C1810]/70 leading-relaxed font-light">
+                <p>
+                  Vrenku lahir dari sebuah keinginan sederhana: <span className="text-[#2C1810] font-normal italic">menyediakan ruang singgah yang tidak menuntut apa-apa.</span>
+                </p>
+                <p>
+                  Kami bukan warkop yang mengejar perputaran meja. Kami menghargai jeda. Di sini, kamu boleh duduk tanpa langsung memesan, mengamati suasana, atau bahkan menyeduh kopimu sendiri.
+                </p>
+                <div className="pt-6 border-t border-[#8B4513]/10 flex items-center gap-4">
+                   <div className="w-12 h-[1px] bg-[#8B4513]" />
+                   <p className="font-serif italic text-[#8B4513] text-base md:text-xl">Bang Adit, Pemilik Vrenku</p>
+                </div>
+              </div>
+            </FadeIn>
+            
+            <FadeIn delay={400} className="mt-12 md:mt-20 rounded-[2rem] overflow-hidden shadow-2xl group">
+               <img 
+                src="https://images.unsplash.com/photo-1559925393-8be0ec41b504?auto=format&fit=crop&q=80&w=1200" 
+                alt="Suasana Warkop" 
+                className="w-full h-[350px] md:h-[550px] object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
+              />
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: PENGALAMAN (MOBILE RESPONSIVE GALLERY) */}
+      <section className="py-24 md:py-40 bg-white">
+        <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-20 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <FadeIn className="max-w-2xl">
+            <h2 className="font-serif text-4xl md:text-7xl text-[#8B4513] mb-4 md:mb-6">Rasakan sebelum tiba.</h2>
+            <p className="text-lg md:text-xl text-[#9B8B7E] font-light">Momen kecil yang mendefinisikan kenyamanan kami.</p>
+          </FadeIn>
+          <div className="hidden md:flex items-center gap-4 text-[#8B4513]/30">
+            <span className="text-[10px] uppercase tracking-widest">Geser horizontal</span>
+            <div className="w-16 h-[1px] bg-current" />
+          </div>
+        </div>
+
+        {/* Desktop: Horizontal Scroll, Mobile: Vertical Grid */}
+        <div className="flex flex-col md:flex-row md:overflow-x-auto hide-scrollbar gap-6 md:gap-8 px-6 md:px-24 pb-8">
+          {[
+            { img: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&q=80&w=800", text: "Cahaya pagi yang menenangkan." },
+            { img: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=800", text: "Meja kayu penampung cerita." },
+            { img: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=800", text: "Sudut bagi para pemikir." },
+            { img: "https://images.unsplash.com/photo-1507133750070-4ed01901c121?auto=format&fit=crop&q=80&w=800", text: "Kopi yang kamu racik sendiri." },
+            { img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=800", text: "Tempat jeda paling jujur." },
+          ].map((item, idx) => (
+            <div key={idx} className="w-full md:min-w-[400px] group">
+              <FadeIn delay={idx * 50} direction="scale">
+                <div className="relative h-[400px] md:h-[500px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 shadow-lg transition-all duration-700 group-hover:shadow-2xl md:group-hover:-translate-y-3">
+                  <img src={item.img} alt={item.text} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8 md:p-12">
+                    <p className="text-white text-base md:text-xl font-serif italic tracking-wide">{item.text}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 4: UNIK */}
+      <section className="py-24 md:py-40 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-16 md:mb-24">
+          <FadeIn>
+            <h2 className="font-serif text-4xl md:text-6xl text-[#8B4513] mb-4">Kenapa di Vrenku?</h2>
+            <div className="w-16 h-[1px] bg-[#8B4513]/30 mx-auto" />
+          </FadeIn>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {[
+            { icon: Sofa, title: "Duduk dulu saja", desc: "Nikmati suasananya. Pesan saat kamu benar-benar siap, tanpa pernah diburu waktu." },
+            { icon: Coffee, title: "Bar terbuka", desc: "Ingin mencoba membuat kopimu sendiri? Kami dengan senang hati berbagi ruang seduh." },
+            { icon: Heart, title: "Tanpa basa-basi", desc: "Kami menghargai privasimu. Cocok untukmu yang butuh ruang tanpa gangguan." },
+            { icon: DoorOpen, title: "Datanglah sendiri", desc: "Sendiri tidak berarti sepi. Vrenku adalah rumah bagi setiap pengelana kota." }
+          ].map((item, idx) => (
+            <FadeIn key={idx} delay={idx * 50} direction="up">
+              <div className="group bg-white p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-[#8B4513]/5 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 transition-all duration-500 hover:shadow-xl hover:bg-[#FAF7F2]">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-[#8B4513]/5 flex items-center justify-center text-[#8B4513] transition-all duration-500 group-hover:bg-[#8B4513] group-hover:text-white">
+                  <item.icon strokeWidth={1} size={32} />
+                </div>
+                <div className="text-center md:text-left">
+                  <h3 className="font-serif text-xl md:text-2xl mb-3 md:mb-4 transition-colors group-hover:text-[#8B4513]">{item.title}</h3>
+                  <p className="text-[#9B8B7E] text-base md:text-lg leading-relaxed font-light">{item.desc}</p>
+                </div>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION 5: EMOTIONAL CALL */}
+      <section className="py-24 md:py-40 bg-[#4A5240] text-[#FAF7F2] relative overflow-hidden">
+        <div className="max-w-5xl mx-auto px-6 relative z-10">
+          <FadeIn className="text-center md:text-left">
+            <h2 className="font-serif text-4xl md:text-7xl mb-12 md:mb-20 opacity-20 italic">Sebuah Ruang Singgah.</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
+              <div className="space-y-8 md:space-y-12 text-xl md:text-3xl font-light leading-snug">
+                <TextReveal delay={100}><p>Untuk kamu yang lelah dengan riuhnya jalanan.</p></TextReveal>
+                <TextReveal delay={300}><p>Untuk kamu yang butuh diam, tanpa perlu merasa aneh.</p></TextReveal>
+                <TextReveal delay={500}><p>Untuk kamu yang mencari rumah di tengah kota.</p></TextReveal>
+                
+                <div className="pt-8">
+                   <FadeIn delay={700} className="flex items-center gap-4">
+                      <Sparkles className="text-[#8B4513] shrink-0" />
+                      <p className="font-serif italic text-3xl md:text-4xl">Pintu kami terbuka.</p>
+                   </FadeIn>
+                </div>
+              </div>
+              
+              <FadeIn direction="left" delay={300} className="relative group mt-8 md:mt-0">
+                <div className="absolute -inset-3 border border-[#FAF7F2]/10 rounded-[2rem] md:rounded-[3rem]" />
+                <img 
+                  src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&q=80&w=1000" 
+                  className="rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000"
+                  alt="Ketenangan Malam"
+                />
+              </FadeIn>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* SECTION 6: CLOSING */}
+      <section className="py-32 md:py-52 px-6 text-center bg-[#FAF7F2]">
+        <FadeIn className="max-w-4xl mx-auto">
+          <span className="text-[#8B4513] tracking-[0.4em] text-[10px] uppercase mb-6 block">Singgah Kapan Saja</span>
+          <h2 className="font-serif text-5xl md:text-8xl text-[#8B4513] mb-8 md:mb-12 leading-tight">Tak perlu rencana.</h2>
+          <p className="text-lg md:text-2xl text-[#2C1810]/70 mb-12 md:mb-20 leading-relaxed font-light max-w-2xl mx-auto">
+            Cukup bawa dirimu, dan biarkan kami menyambutmu sebagai teman lama yang baru saja bertemu kembali.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8">
+            <a 
+              href="https://www.instagram.com/warkopvrenku.man/" 
+              target="_blank" 
+              rel="noreferrer"
+              className="w-full sm:w-auto group relative px-8 md:px-12 py-5 md:py-6 bg-[#8B4513] text-white rounded-full overflow-hidden transition-all duration-500 hover:shadow-xl active:scale-95"
+            >
+              <div className="relative z-10 flex items-center justify-center gap-3 text-base md:text-lg">
+                <Instagram size={20} />
+                <span>Mampir ke Instagram</span>
+              </div>
+              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+            </a>
+            
+            <a 
+              href="#" 
+              target="_blank" 
+              className="group flex items-center gap-3 text-[#8B4513] text-base md:text-lg font-medium hover:opacity-70 transition-all py-4"
+            >
+              <div className="p-3 border border-[#8B4513]/20 rounded-full group-hover:bg-[#8B4513]/5 transition-colors">
+                <MapPin size={20} />
+              </div>
+              <span className="border-b border-[#8B4513]/20">Arahkan jalan</span>
+            </a>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-12 md:py-20 border-t border-[#8B4513]/10 px-6 bg-white/50">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
+          <div>
+            <h3 className="font-serif text-2xl md:text-3xl text-[#8B4513] mb-1">Vrenku.</h3>
+            <p className="font-light tracking-[0.2em] text-[10px] md:text-xs uppercase opacity-60 italic">Singgah Dulu, Tidak Buru-Buru.</p>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 md:gap-12 text-[10px] md:text-xs font-medium uppercase tracking-widest opacity-40 italic">
+            <span>Banjarmasin, Indonesia</span>
+            <span>Est. 2026</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
