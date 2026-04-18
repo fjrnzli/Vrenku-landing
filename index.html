@@ -1,332 +1,806 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Coffee, Heart, DoorOpen, Instagram, MapPin, Sofa, ChevronDown, Sparkles } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Singgah dulu. — Vrenku</title>
+  <meta name="description" content="Vrenku adalah tempat singgah yang hangat di Banjarmasin. Tidak ada yang terburu-buru di sini." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-// --- Komponen Text Reveal yang Lebih Ringan ---
-const TextReveal = ({ children, delay = 0 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const domRef = useRef();
+    :root {
+      --cream:      #F7F3ED;
+      --cream-dark: #EDE6DB;
+      --brown:      #6B3A2A;
+      --brown-mid:  #8B4E38;
+      --brown-light:#C4956A;
+      --army:       #4A5240;
+      --text:       #2C1A10;
+      --text-muted: #9B8B7E;
+      --white:      #FDFAF6;
+      --font-serif: 'Lora', Georgia, serif;
+      --font-sans:  'Plus Jakarta Sans', sans-serif;
+    }
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.unobserve(entry.target);
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── FADE-IN ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(.22,.68,0,1.2), transform 0.8s cubic-bezier(.22,.68,0,1.2);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left  { transform: translateX(-28px); }
+    .reveal-right { transform: translateX(28px); }
+    .reveal-left.visible,
+    .reveal-right.visible { transform: translateX(0); opacity: 1; }
+
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.35s; }
+    .delay-4 { transition-delay: 0.5s; }
+    .delay-5 { transition-delay: 0.65s; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 100px 24px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .container-narrow { max-width: 720px; margin: 0 auto; }
+
+    /* ─────────────────────────────
+       SECTION 1: HERO
+    ───────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #hero .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&q=80&w=1600');
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.06);
+      transition: transform 0.1s linear;
+    }
+
+    #hero .hero-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(30, 14, 6, 0.88) 0%,
+        rgba(30, 14, 6, 0.45) 50%,
+        rgba(30, 14, 6, 0.1) 100%
+      );
+    }
+
+    #hero .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 60px 32px;
+      max-width: 900px;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--brown-light);
+    }
+
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(52px, 10vw, 96px);
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--brown-light);
+    }
+
+    .hero-sub {
+      font-family: var(--font-sans);
+      font-size: clamp(15px, 2vw, 18px);
+      font-weight: 300;
+      color: rgba(253, 250, 246, 0.75);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .hero-scroll {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(253,250,246,0.45);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .hero-scroll:hover { color: var(--brown-light); }
+    .hero-scroll svg { animation: bounce 2s infinite; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ─────────────────────────────
+       SECTION 2: FILOSOFI
+    ───────────────────────────── */
+    #filosofi {
+      background: var(--white);
+    }
+
+    .filosofi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brown-mid);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--brown-mid);
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .section-title em { font-style: italic; color: var(--brown-mid); }
+
+    .section-body {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.8;
+      color: #5a4035;
+      margin-bottom: 16px;
+    }
+
+    .quote-mark {
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-muted);
+      border-left: 2px solid var(--brown-light);
+      padding-left: 16px;
+      margin-top: 28px;
+    }
+    .quote-mark span {
+      display: block;
+      font-style: normal;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-top: 8px;
+    }
+
+    .filosofi-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      border-radius: 4px;
+      filter: sepia(15%) saturate(90%);
+    }
+
+    /* ─────────────────────────────
+       SECTION 3: SUASANA
+    ───────────────────────────── */
+    #suasana {
+      background: var(--cream);
+      padding-bottom: 80px;
+    }
+
+    #suasana .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+      cursor: default;
+    }
+    .gallery-item:nth-child(1) { grid-column: span 2; aspect-ratio: 16/9; }
+    .gallery-item:nth-child(2) { aspect-ratio: 4/5; }
+    .gallery-item:nth-child(3) { aspect-ratio: 4/5; }
+    .gallery-item:nth-child(4) { aspect-ratio: 16/9; }
+    .gallery-item:nth-child(5) { grid-column: span 2; aspect-ratio: 21/9; }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(12%) saturate(88%);
+      transition: transform 0.7s cubic-bezier(.22,.68,0,1), filter 0.5s;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.04);
+      filter: sepia(0%) saturate(100%);
+    }
+
+    .gallery-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 18px 16px;
+      background: linear-gradient(to top, rgba(20,8,2,0.65), transparent);
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 14px;
+      color: rgba(253,250,246,0.85);
+      transform: translateY(4px);
+      opacity: 0;
+      transition: all 0.4s;
+    }
+    .gallery-item:hover .gallery-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─────────────────────────────
+       SECTION 4: KENAPA VRENKU
+    ───────────────────────────── */
+    #kenapa {
+      background: var(--brown);
+      color: var(--white);
+    }
+
+    #kenapa .section-eyebrow { color: var(--brown-light); }
+    #kenapa .section-eyebrow::before { background: var(--brown-light); }
+    #kenapa .section-title { color: var(--white); }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-top: 56px;
+      border: 2px solid rgba(253,250,246,0.08);
+    }
+
+    .card {
+      padding: 48px 40px;
+      border: 1px solid rgba(253,250,246,0.08);
+      transition: background 0.4s;
+    }
+    .card:hover { background: rgba(253,250,246,0.05); }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 24px;
+      color: var(--brown-light);
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .card-desc {
+      font-size: 15px;
+      font-weight: 300;
+      line-height: 1.75;
+      color: rgba(253,250,246,0.6);
+    }
+
+    /* ─────────────────────────────
+       SECTION 5: UNTUK SIAPA
+    ───────────────────────────── */
+    #untuk-siapa {
+      background: var(--cream-dark);
+    }
+
+    .untuk-siapa-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .untuk-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      border-radius: 4px;
+      filter: sepia(18%) saturate(85%);
+    }
+
+    .untuk-lines {
+      list-style: none;
+      margin: 32px 0;
+    }
+    .untuk-lines li {
+      font-family: var(--font-serif);
+      font-size: clamp(18px, 2.2vw, 24px);
+      font-weight: 400;
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(107,58,42,0.15);
+      opacity: 0.85;
+      transition: opacity 0.3s;
+    }
+    .untuk-lines li:first-child { border-top: 1px solid rgba(107,58,42,0.15); }
+    .untuk-lines li:hover { opacity: 1; }
+    .untuk-lines li em { font-style: italic; color: var(--brown-mid); }
+
+    .untuk-closing {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 20px;
+      color: var(--brown-mid);
+      margin-top: 8px;
+    }
+
+    /* ─────────────────────────────
+       SECTION 6: CLOSING
+    ───────────────────────────── */
+    #closing {
+      background: var(--army);
+      text-align: center;
+      color: var(--white);
+      padding: 120px 24px;
+    }
+
+    #closing .section-eyebrow { 
+      justify-content: center; 
+      color: rgba(253,250,246,0.5);
+    }
+    #closing .section-eyebrow::before { background: rgba(253,250,246,0.3); }
+
+    .closing-title {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    .closing-title em { font-style: italic; color: rgba(196,149,106,0.9); }
+
+    .closing-sub {
+      font-size: 16px;
+      font-weight: 300;
+      color: rgba(253,250,246,0.6);
+      max-width: 460px;
+      margin: 0 auto 48px;
+      line-height: 1.8;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: var(--brown-light);
+      color: var(--white);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover {
+      background: var(--brown-mid);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border: 1px solid rgba(253,250,246,0.25);
+      color: rgba(253,250,246,0.75);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: border-color 0.3s, color 0.3s, transform 0.2s;
+    }
+    .btn-ghost:hover {
+      border-color: rgba(253,250,246,0.6);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    /* ─────────────────────────────
+       FOOTER
+    ───────────────────────────── */
+    footer {
+      background: var(--text);
+      padding: 48px 24px;
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+    }
+
+    .footer-tagline {
+      font-size: 12px;
+      font-weight: 300;
+      color: rgba(247,243,237,0.35);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 8px 0 24px;
+    }
+
+    .footer-meta {
+      font-size: 12px;
+      color: rgba(247,243,237,0.3);
+      line-height: 1.8;
+    }
+
+    /* ─────────────────────────────
+       RESPONSIVE
+    ───────────────────────────── */
+    @media (max-width: 768px) {
+      section { padding: 72px 20px; }
+
+      .filosofi-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
       }
-    }, { threshold: 0.2 });
-    if (domRef.current) observer.observe(domRef.current);
-    return () => observer.disconnect();
-  }, []);
+      .filosofi-img { aspect-ratio: 16/9; }
 
-  return (
-    <div ref={domRef} className="overflow-hidden">
-      <div 
-        className={`transition-all duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
-        }`}
-        style={{ transitionDelay: `${delay}ms`, willChange: 'transform, opacity' }}
-      >
-        {children}
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .gallery-item:nth-child(1) { grid-column: span 2; aspect-ratio: 16/9; }
+      .gallery-item:nth-child(5) { grid-column: span 2; aspect-ratio: 16/9; }
+      .gallery-item:nth-child(2),
+      .gallery-item:nth-child(3),
+      .gallery-item:nth-child(4) { aspect-ratio: 1/1; }
+
+      .cards-grid { grid-template-columns: 1fr; }
+      .card { padding: 36px 28px; }
+
+      .untuk-siapa-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .untuk-img { aspect-ratio: 16/9; order: -1; }
+
+      #hero .hero-content { padding: 40px 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-item,
+      .gallery-item:nth-child(n) {
+        grid-column: span 1;
+        aspect-ratio: 4/3;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── SECTION 1: HERO ── -->
+  <section id="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-gradient"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow reveal">Banjarmasin — Est. 2026</p>
+      <h1 class="hero-title reveal delay-1">
+        Singgah<br><em>dulu.</em>
+      </h1>
+      <p class="hero-sub reveal delay-2">
+        Tidak ada yang terburu-buru di sini. Tarik kursi, temukan tenangmu.
+      </p>
+      <a href="#filosofi" class="hero-scroll reveal delay-3">
+        Kenali Vrenku
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: FILOSOFI ── -->
+  <section id="filosofi">
+    <div class="container">
+      <div class="filosofi-grid">
+        <div>
+          <p class="section-eyebrow reveal">Filosofi Kami</p>
+          <h2 class="section-title reveal delay-1">
+            Teman dulu,<br><em>jual-beli belakangan.</em>
+          </h2>
+          <p class="section-body reveal delay-2">
+            Vrenku lahir dari sebuah keinginan sederhana: menyediakan ruang singgah yang tidak menuntut apa-apa.
+          </p>
+          <p class="section-body reveal delay-3">
+            Kami bukan kedai yang mengejar perputaran meja. Kami menghargai jeda. Di sini, kamu boleh duduk dulu, lihat-lihat dulu, atau bahkan menyeduh kopimu sendiri.
+          </p>
+          <blockquote class="quote-mark reveal delay-4">
+            Setiap orang yang masuk ke sini adalah teman yang baru saja kami kenal.
+            <span>Bang Adit, Pemilik Vrenku</span>
+          </blockquote>
+        </div>
+        <div class="reveal reveal-right delay-2">
+          <img
+            class="filosofi-img"
+            src="https://images.unsplash.com/photo-1559925393-8be0ec41b504?auto=format&fit=crop&q=80&w=900"
+            alt="Suasana dalam Vrenku"
+            loading="lazy"
+          />
+        </div>
       </div>
     </div>
-  );
-};
+  </section>
 
-// --- Komponen FadeIn dengan Optimasi Performa ---
-const FadeIn = ({ children, delay = 0, direction = 'up', className = '' }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const domRef = useRef();
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsVisible(true);
-        observer.unobserve(entry.target);
-      }
-    }, { threshold: 0.1 });
-    if (domRef.current) observer.observe(domRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const variants = {
-    up: 'translate-y-10',
-    down: '-translate-y-10',
-    left: 'translate-x-10',
-    right: '-translate-x-10',
-    scale: 'scale-[0.98]'
-  };
-
-  return (
-    <div
-      ref={domRef}
-      className={`transition-all duration-[1000ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${className} ${
-        isVisible ? 'opacity-100 translate-y-0 translate-x-0 scale-100' : `opacity-0 ${variants[direction] || 'translate-y-10'}`
-      }`}
-      style={{ transitionDelay: `${delay}ms`, willChange: 'transform, opacity' }}
-    >
-      {children}
+  <!-- ── SECTION 3: SUASANA ── -->
+  <section id="suasana">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow reveal" style="justify-content:center;">Suasana & Pengalaman</p>
+        <h2 class="section-title reveal delay-1" style="text-align:center;">Rasakan sebelum<br><em>kamu tiba.</em></h2>
+        <p class="section-body reveal delay-2" style="text-align:center;max-width:480px;margin:0 auto;">
+          Momen-momen kecil yang mendefinisikan kenyamanan kami.
+        </p>
+      </div>
+      <div class="gallery-grid">
+        <div class="gallery-item reveal">
+          <img src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&q=80&w=1200" alt="Suasana kafe" loading="lazy" />
+          <div class="gallery-caption">Cahaya yang tidak terburu-buru.</div>
+        </div>
+        <div class="gallery-item reveal delay-1">
+          <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=800" alt="Kopi hangat" loading="lazy" />
+          <div class="gallery-caption">Meja kayu penampung cerita.</div>
+        </div>
+        <div class="gallery-item reveal delay-2">
+          <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=800" alt="Sudut cozy" loading="lazy" />
+          <div class="gallery-caption">Sudut bagi para pemikir.</div>
+        </div>
+        <div class="gallery-item reveal delay-1">
+          <img src="https://images.unsplash.com/photo-1507133750070-4ed01901c121?auto=format&fit=crop&q=80&w=800" alt="Membuat kopi sendiri" loading="lazy" />
+          <div class="gallery-caption">Kopi yang kamu racik sendiri.</div>
+        </div>
+        <div class="gallery-item reveal delay-2">
+          <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&q=80&w=1200" alt="Tempat jeda" loading="lazy" />
+          <div class="gallery-caption">Tempat jeda paling jujur.</div>
+        </div>
+      </div>
     </div>
-  );
-};
+  </section>
 
-export default function VrenkuApp() {
-  const [scrollY, setScrollY] = useState(0);
+  <!-- ── SECTION 4: KENAPA VRENKU ── -->
+  <section id="kenapa">
+    <div class="container">
+      <p class="section-eyebrow reveal">Yang Membuat Kami Berbeda</p>
+      <h2 class="section-title reveal delay-1" style="max-width:520px;">Kenapa di <em>Vrenku?</em></h2>
+      <div class="cards-grid">
 
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
+        <div class="card reveal">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+            <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+          <h3 class="card-title">Duduk dulu saja</h3>
+          <p class="card-desc">Nikmati suasananya. Pesan saat kamu benar-benar siap, tanpa pernah diburu-buru.</p>
+        </div>
 
-    let requestRef;
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-      requestRef = requestAnimationFrame(() => {});
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(requestRef);
-    };
-  }, []);
+        <div class="card reveal delay-1">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8Z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/>
+            <line x1="10" y1="1" x2="10" y2="4"/>
+            <line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          <h3 class="card-title">Bar terbuka untukmu</h3>
+          <p class="card-desc">Ingin mencoba membuat kopimu sendiri? Kami dengan senang hati berbagi ruang seduh.</p>
+        </div>
 
-  return (
-    <div className="font-sans antialiased text-[#2C1810] bg-[#FAF7F2] min-h-screen selection:bg-[#8B4513]/20 overflow-x-hidden" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <style dangerouslySetInnerHTML={{__html: `
-        .font-serif { font-family: 'Lora', serif; }
-        .bg-grain {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        <div class="card reveal delay-2">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78Z"/>
+          </svg>
+          <h3 class="card-title">Tanpa basa-basi</h3>
+          <p class="card-desc">Kami menghargai privasimu. Cocok untukmu yang butuh ruang tenang tanpa gangguan.</p>
+        </div>
+
+        <div class="card reveal delay-3">
+          <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <h3 class="card-title">Datanglah sendiri</h3>
+          <p class="card-desc">Sendiri tidak berarti sepi. Vrenku adalah rumah bagi setiap pengelana kota, tanpa terkecuali.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: UNTUK SIAPA ── -->
+  <section id="untuk-siapa">
+    <div class="container">
+      <div class="untuk-siapa-inner">
+        <div>
+          <p class="section-eyebrow reveal">Ini Untukmu</p>
+          <h2 class="section-title reveal delay-1">Siapa yang<br>kami sambut?</h2>
+          <ul class="untuk-lines">
+            <li class="reveal delay-1">Kamu yang pulang kuliah dan <em>belum mau balik kos.</em></li>
+            <li class="reveal delay-2">Kamu yang butuh tempat kerja tapi <em>tidak suka keramaian.</em></li>
+            <li class="reveal delay-3">Kamu yang hanya ingin <em>diam dan menikmati waktu sendiri</em> tanpa merasa aneh.</li>
+            <li class="reveal delay-4">Kamu yang belum tahu mau ke mana, tapi <em>tahu tidak mau sendirian.</em></li>
+          </ul>
+          <p class="untuk-closing reveal delay-5">Vrenku ada untuk semua itu.</p>
+        </div>
+        <div class="reveal reveal-right delay-2">
+          <img
+            class="untuk-img"
+            src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&q=80&w=900"
+            alt="Pengunjung Vrenku"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: CLOSING ── -->
+  <section id="closing">
+    <div class="container-narrow">
+      <p class="section-eyebrow reveal">Singgah Kapan Saja</p>
+      <h2 class="closing-title reveal delay-1">
+        Tak perlu<br><em>rencana.</em>
+      </h2>
+      <p class="closing-sub reveal delay-2">
+        Cukup bawa dirimu, dan biarkan kami menyambutmu seperti teman lama yang baru saja bertemu kembali.
+      </p>
+      <div class="btn-group reveal delay-3">
+        <a href="https://www.instagram.com/warkopvrenku.man/" target="_blank" rel="noopener" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          @warkopvrenku.man
+        </a>
+        <a href="https://maps.google.com" target="_blank" rel="noopener" class="btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          Lihat Lokasi
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <p class="footer-brand">Vrenku.</p>
+    <p class="footer-tagline">Singgah Dulu, Tidak Buru-Buru.</p>
+    <p class="footer-meta">Banjarmasin, Indonesia &nbsp;·&nbsp; Est. 2026</p>
+  </footer>
+
+  <script>
+    // ── Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
         }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        html { scroll-behavior: smooth; }
-      `}} />
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => observer.observe(el));
 
-      {/* Grain Overlay */}
-      <div className="fixed inset-0 z-[100] pointer-events-none bg-grain mix-blend-multiply opacity-40" />
+    // Trigger hero elements immediately
+    document.querySelectorAll('#hero .reveal').forEach((el, i) => {
+      setTimeout(() => el.classList.add('visible'), 200 + i * 150);
+    });
 
-      {/* SECTION 1: HERO */}
-      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: "url('https://images.unsplash.com/photo-1495474472201-447545e31ab3?auto=format&fit=crop&q=80&w=2000')",
-            transform: `scale(${1 + scrollY * 0.0003})`,
-            willChange: 'transform'
-          }}
-        />
-        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/60 via-black/30 to-[#FAF7F2]" />
-
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <FadeIn>
-            <span className="inline-block text-[#FAF7F2]/80 tracking-[0.3em] uppercase text-[10px] md:text-xs mb-6 border-b border-[#FAF7F2]/20 pb-2">Banjarmasin — Sejak 2026</span>
-          </FadeIn>
-          <TextReveal delay={200}>
-            <h1 className="font-serif text-5xl md:text-8xl lg:text-9xl text-[#FAF7F2] mb-6 leading-tight italic drop-shadow-xl">
-              Singgah dulu.
-            </h1>
-          </TextReveal>
-          <FadeIn delay={600}>
-            <p className="text-lg md:text-2xl text-[#FAF7F2]/90 max-w-2xl mx-auto font-light leading-relaxed px-4">
-              Tidak ada yang terburu-buru di sini. Tarik kursi, temukan tenangmu.
-            </p>
-          </FadeIn>
-        </div>
-
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-3">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-[#FAF7F2]/40 to-transparent" />
-          <ChevronDown size={18} className="text-[#FAF7F2]/40 animate-bounce" />
-        </div>
-      </section>
-
-      {/* SECTION 2: FILOSOFI */}
-      <section className="relative py-24 md:py-40 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-start">
-          <div className="lg:col-span-5 lg:sticky lg:top-40">
-            <FadeIn direction="right">
-              <span className="text-[#8B4513] font-medium tracking-widest uppercase text-xs mb-4 block italic">— Filosofi Kami</span>
-              <h2 className="font-serif text-4xl md:text-7xl text-[#8B4513] mb-6 md:mb-8 leading-tight">
-                Teman dulu, jual-beli belakangan.
-              </h2>
-            </FadeIn>
-          </div>
-          
-          <div className="lg:col-span-7 lg:pl-16">
-            <FadeIn delay={200}>
-              <div className="space-y-8 text-lg md:text-2xl text-[#2C1810]/70 leading-relaxed font-light">
-                <p>
-                  Vrenku lahir dari sebuah keinginan sederhana: <span className="text-[#2C1810] font-normal italic">menyediakan ruang singgah yang tidak menuntut apa-apa.</span>
-                </p>
-                <p>
-                  Kami bukan warkop yang mengejar perputaran meja. Kami menghargai jeda. Di sini, kamu boleh duduk tanpa langsung memesan, mengamati suasana, atau bahkan menyeduh kopimu sendiri.
-                </p>
-                <div className="pt-6 border-t border-[#8B4513]/10 flex items-center gap-4">
-                   <div className="w-12 h-[1px] bg-[#8B4513]" />
-                   <p className="font-serif italic text-[#8B4513] text-base md:text-xl">Bang Adit, Pemilik Vrenku</p>
-                </div>
-              </div>
-            </FadeIn>
-            
-            <FadeIn delay={400} className="mt-12 md:mt-20 rounded-[2rem] overflow-hidden shadow-2xl group">
-               <img 
-                src="https://images.unsplash.com/photo-1559925393-8be0ec41b504?auto=format&fit=crop&q=80&w=1200" 
-                alt="Suasana Warkop" 
-                className="w-full h-[350px] md:h-[550px] object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-105"
-              />
-            </FadeIn>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 3: PENGALAMAN (MOBILE RESPONSIVE GALLERY) */}
-      <section className="py-24 md:py-40 bg-white">
-        <div className="max-w-7xl mx-auto px-6 mb-12 md:mb-20 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-          <FadeIn className="max-w-2xl">
-            <h2 className="font-serif text-4xl md:text-7xl text-[#8B4513] mb-4 md:mb-6">Rasakan sebelum tiba.</h2>
-            <p className="text-lg md:text-xl text-[#9B8B7E] font-light">Momen kecil yang mendefinisikan kenyamanan kami.</p>
-          </FadeIn>
-          <div className="hidden md:flex items-center gap-4 text-[#8B4513]/30">
-            <span className="text-[10px] uppercase tracking-widest">Geser horizontal</span>
-            <div className="w-16 h-[1px] bg-current" />
-          </div>
-        </div>
-
-        {/* Desktop: Horizontal Scroll, Mobile: Vertical Grid */}
-        <div className="flex flex-col md:flex-row md:overflow-x-auto hide-scrollbar gap-6 md:gap-8 px-6 md:px-24 pb-8">
-          {[
-            { img: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&q=80&w=800", text: "Cahaya pagi yang menenangkan." },
-            { img: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80&w=800", text: "Meja kayu penampung cerita." },
-            { img: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=800", text: "Sudut bagi para pemikir." },
-            { img: "https://images.unsplash.com/photo-1507133750070-4ed01901c121?auto=format&fit=crop&q=80&w=800", text: "Kopi yang kamu racik sendiri." },
-            { img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=800", text: "Tempat jeda paling jujur." },
-          ].map((item, idx) => (
-            <div key={idx} className="w-full md:min-w-[400px] group">
-              <FadeIn delay={idx * 50} direction="scale">
-                <div className="relative h-[400px] md:h-[500px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden mb-4 shadow-lg transition-all duration-700 group-hover:shadow-2xl md:group-hover:-translate-y-3">
-                  <img src={item.img} alt={item.text} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#2C1810]/80 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-500 flex items-end p-8 md:p-12">
-                    <p className="text-white text-base md:text-xl font-serif italic tracking-wide">{item.text}</p>
-                  </div>
-                </div>
-              </FadeIn>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 4: UNIK */}
-      <section className="py-24 md:py-40 px-6 max-w-7xl mx-auto">
-        <div className="text-center mb-16 md:mb-24">
-          <FadeIn>
-            <h2 className="font-serif text-4xl md:text-6xl text-[#8B4513] mb-4">Kenapa di Vrenku?</h2>
-            <div className="w-16 h-[1px] bg-[#8B4513]/30 mx-auto" />
-          </FadeIn>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {[
-            { icon: Sofa, title: "Duduk dulu saja", desc: "Nikmati suasananya. Pesan saat kamu benar-benar siap, tanpa pernah diburu waktu." },
-            { icon: Coffee, title: "Bar terbuka", desc: "Ingin mencoba membuat kopimu sendiri? Kami dengan senang hati berbagi ruang seduh." },
-            { icon: Heart, title: "Tanpa basa-basi", desc: "Kami menghargai privasimu. Cocok untukmu yang butuh ruang tanpa gangguan." },
-            { icon: DoorOpen, title: "Datanglah sendiri", desc: "Sendiri tidak berarti sepi. Vrenku adalah rumah bagi setiap pengelana kota." }
-          ].map((item, idx) => (
-            <FadeIn key={idx} delay={idx * 50} direction="up">
-              <div className="group bg-white p-8 md:p-12 rounded-[2rem] md:rounded-[3rem] border border-[#8B4513]/5 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 transition-all duration-500 hover:shadow-xl hover:bg-[#FAF7F2]">
-                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-[#8B4513]/5 flex items-center justify-center text-[#8B4513] transition-all duration-500 group-hover:bg-[#8B4513] group-hover:text-white">
-                  <item.icon strokeWidth={1} size={32} />
-                </div>
-                <div className="text-center md:text-left">
-                  <h3 className="font-serif text-xl md:text-2xl mb-3 md:mb-4 transition-colors group-hover:text-[#8B4513]">{item.title}</h3>
-                  <p className="text-[#9B8B7E] text-base md:text-lg leading-relaxed font-light">{item.desc}</p>
-                </div>
-              </div>
-            </FadeIn>
-          ))}
-        </div>
-      </section>
-
-      {/* SECTION 5: EMOTIONAL CALL */}
-      <section className="py-24 md:py-40 bg-[#4A5240] text-[#FAF7F2] relative overflow-hidden">
-        <div className="max-w-5xl mx-auto px-6 relative z-10">
-          <FadeIn className="text-center md:text-left">
-            <h2 className="font-serif text-4xl md:text-7xl mb-12 md:mb-20 opacity-20 italic">Sebuah Ruang Singgah.</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div className="space-y-8 md:space-y-12 text-xl md:text-3xl font-light leading-snug">
-                <TextReveal delay={100}><p>Untuk kamu yang lelah dengan riuhnya jalanan.</p></TextReveal>
-                <TextReveal delay={300}><p>Untuk kamu yang butuh diam, tanpa perlu merasa aneh.</p></TextReveal>
-                <TextReveal delay={500}><p>Untuk kamu yang mencari rumah di tengah kota.</p></TextReveal>
-                
-                <div className="pt-8">
-                   <FadeIn delay={700} className="flex items-center gap-4">
-                      <Sparkles className="text-[#8B4513] shrink-0" />
-                      <p className="font-serif italic text-3xl md:text-4xl">Pintu kami terbuka.</p>
-                   </FadeIn>
-                </div>
-              </div>
-              
-              <FadeIn direction="left" delay={300} className="relative group mt-8 md:mt-0">
-                <div className="absolute -inset-3 border border-[#FAF7F2]/10 rounded-[2rem] md:rounded-[3rem]" />
-                <img 
-                  src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?auto=format&fit=crop&q=80&w=1000" 
-                  className="rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl grayscale-[40%] group-hover:grayscale-0 transition-all duration-1000"
-                  alt="Ketenangan Malam"
-                />
-              </FadeIn>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* SECTION 6: CLOSING */}
-      <section className="py-32 md:py-52 px-6 text-center bg-[#FAF7F2]">
-        <FadeIn className="max-w-4xl mx-auto">
-          <span className="text-[#8B4513] tracking-[0.4em] text-[10px] uppercase mb-6 block">Singgah Kapan Saja</span>
-          <h2 className="font-serif text-5xl md:text-8xl text-[#8B4513] mb-8 md:mb-12 leading-tight">Tak perlu rencana.</h2>
-          <p className="text-lg md:text-2xl text-[#2C1810]/70 mb-12 md:mb-20 leading-relaxed font-light max-w-2xl mx-auto">
-            Cukup bawa dirimu, dan biarkan kami menyambutmu sebagai teman lama yang baru saja bertemu kembali.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8">
-            <a 
-              href="https://www.instagram.com/warkopvrenku.man/" 
-              target="_blank" 
-              rel="noreferrer"
-              className="w-full sm:w-auto group relative px-8 md:px-12 py-5 md:py-6 bg-[#8B4513] text-white rounded-full overflow-hidden transition-all duration-500 hover:shadow-xl active:scale-95"
-            >
-              <div className="relative z-10 flex items-center justify-center gap-3 text-base md:text-lg">
-                <Instagram size={20} />
-                <span>Mampir ke Instagram</span>
-              </div>
-              <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-            </a>
-            
-            <a 
-              href="#" 
-              target="_blank" 
-              className="group flex items-center gap-3 text-[#8B4513] text-base md:text-lg font-medium hover:opacity-70 transition-all py-4"
-            >
-              <div className="p-3 border border-[#8B4513]/20 rounded-full group-hover:bg-[#8B4513]/5 transition-colors">
-                <MapPin size={20} />
-              </div>
-              <span className="border-b border-[#8B4513]/20">Arahkan jalan</span>
-            </a>
-          </div>
-        </FadeIn>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="py-12 md:py-20 border-t border-[#8B4513]/10 px-6 bg-white/50">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 text-center md:text-left">
-          <div>
-            <h3 className="font-serif text-2xl md:text-3xl text-[#8B4513] mb-1">Vrenku.</h3>
-            <p className="font-light tracking-[0.2em] text-[10px] md:text-xs uppercase opacity-60 italic">Singgah Dulu, Tidak Buru-Buru.</p>
-          </div>
-          <div className="flex flex-col md:flex-row gap-4 md:gap-12 text-[10px] md:text-xs font-medium uppercase tracking-widest opacity-40 italic">
-            <span>Banjarmasin, Indonesia</span>
-            <span>Est. 2026</span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+    // ── Parallax hero background (desktop only)
+    const heroBg = document.getElementById('heroBg');
+    if (window.innerWidth > 768) {
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        heroBg.style.transform = `scale(1.06) translateY(${y * 0.25}px)`;
+      }, { passive: true });
+    }
+  </script>
+</body>
+</html>
